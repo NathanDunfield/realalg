@@ -8,6 +8,13 @@ from math import log10 as log
 from numbers import Integral
 import sympy as sp
 
+# By default, Python will only convert a decimal string of length at
+# most 4300 to an intger, to protect against DDOS attacks not relevant
+# here (CVE-2020-10735).
+import sys
+if hasattr(sys, 'set_int_max_str_digits'):
+    sys.set_int_max_str_digits(0)
+
 from .interval import Interval
 
 sp_x = sp.Symbol('x')
