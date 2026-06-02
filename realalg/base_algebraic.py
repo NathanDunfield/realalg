@@ -39,7 +39,7 @@ class BaseRealNumberField:
             raise ValueError(f'Polynomial {self.sp_polynomial} has no real roots')
         self.sp_place = real_roots[index]
         self._accuracy = 0
-        self._intervals = None
+        self._intervals = dict()
         self.lmbda = None  # To be created by instances.
     
     def __str__(self):
@@ -52,19 +52,23 @@ class BaseRealNumberField:
         return (self.__class__, (self.coefficients,))
     def __eq__(self, other):
         return self.coefficients == other.coefficients and self.index == other.index
+    def find_root_as_interval(self, precision):
+        s = str(sp.N(self.sp_place, precision))
+        return Interval.from_string(s, precision)
     
     def intervals(self, accuracy):
         ''' Return intervals around self.lmbda**i with at least the requested accuracy. '''
         assert isinstance(accuracy, Integral)
         assert accuracy > 0
-        if accuracy > self._accuracy:
+        if accuracy not in self._intervals:
             precision = int(accuracy + self.degree*self.log_bound + 1) + 1  # Cheap ceil.
-            s = str(sp.N(self.sp_place, precision))
-            interval = Interval.from_string(s, precision)
-            self._intervals = [interval**i for i in range(self.degree)]
-            assert all(I.accuracy >= accuracy for I in self._intervals)
-            self._accuracy = accuracy
-        return [I.simplify(accuracy+1) for I in self._intervals]
+            interval = self.find_root_as_interval(precision)
+            intervals = [interval**i for i in range(self.degree)]
+            assert all(I.accuracy >= accuracy for I in intervals)
+            invervals = [I.simplify(accuracy+1) for I in intervals]
+            self._intervals[accuracy] = intervals
+            self._accuracy = max(accuracy, self._accuracy)
+        return self._intervals[accuracy]
 
 @total_ordering
 class BaseRealAlgebraic(ABC):
