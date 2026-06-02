@@ -14,7 +14,6 @@ for interface in INTERFACES:
         RealNumberField = module.RealNumberField
         RealAlgebraic = module.RealAlgebraic
         eigenvectors = module.eigenvectors
-        print(f'Using {interface}')
         break
         # We could add some code here to find out which interface was loaded.
     except ImportError:
