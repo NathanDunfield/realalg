@@ -5,6 +5,8 @@ from fractions import Fraction
 import numpy as np
 import cypari  # pylint: disable=import-error
 from .base_algebraic import BaseRealNumberField, BaseRealAlgebraic
+from .interval import Interval
+
 
 cp = cypari.pari
 cp_x = cp('x')
@@ -21,6 +23,15 @@ class RealNumberField(BaseRealNumberField):
         super().__init__(coefficients, index)
         self.cp_polynomial = cp_polynomial(self.coefficients)
         self.lmbda = self([0, 1])
+
+    def find_root_as_interval(self, precision):
+        bit_prec = int(3.32192809488737 * precision) + 1
+        old_bit_prec = cp.get_real_precision_bits()
+        cp.set_real_precision_bits(bit_prec)
+        roots = list(self.cp_polynomial.polrootsreal(precision=bit_prec))
+        s = str(roots[self.index])
+        cp.set_real_precision_bits(old_bit_prec)
+        return Interval.from_string(s, precision)
     
     def __call__(self, coefficients):
         return RealAlgebraic(self, cp_polynomial(coefficients).Mod(self.cp_polynomial))
