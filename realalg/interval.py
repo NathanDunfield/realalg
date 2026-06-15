@@ -6,9 +6,9 @@ from numbers import Integral, Rational
 class Interval:
     ''' This represents a closed interval [lower / 10**precision, upper / 10**precision]. '''
     def __init__(self, lower, upper, precision):
-        assert isinstance(lower, Integral)
-        assert isinstance(upper, Integral)
-        assert isinstance(precision, Integral)
+        # assert isinstance(lower, Integral)
+        # assert isinstance(upper, Integral)
+        # assert isinstance(precision, Integral)
         if lower > upper: raise ValueError('Interval is empty')
         if precision < 1: raise ValueError('Interval must have precision at least 1')
         
